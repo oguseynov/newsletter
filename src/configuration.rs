@@ -6,6 +6,8 @@ use secrecy::{ExposeSecret, SecretString};
 pub struct Settings {
     pub database: DatabaseSettings,
     pub application_port: u16,
+    #[serde(default)]
+    pub otel_endpoint: Option<String>,
 }
 #[derive(serde::Deserialize)]
 pub struct DatabaseSettings {

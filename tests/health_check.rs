@@ -88,10 +88,11 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     // because the sink is part of the type returned by `get_subscriber`, therefore they are not the
     // same type. We could work around it, but this is the most straight-forward way of moving forward.
     if std::env::var("TEST_LOG").is_ok() {
-        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
+        let subscriber =
+            get_subscriber(subscriber_name, default_filter_level, std::io::stdout, None);
         init_subscriber(subscriber);
     } else {
-        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::sink);
+        let subscriber = get_subscriber(subscriber_name, default_filter_level, std::io::sink, None);
         init_subscriber(subscriber);
     };
 });
