@@ -14,7 +14,7 @@ async fn main() -> std::io::Result<()> {
         "newsletter".into(),
         "info".into(),
         std::io::stdout,
-        configuration.otel_endpoint.as_deref(),
+        configuration.otel,
     );
     init_subscriber(subscriber);
     let connection_pool = PgPoolOptions::new()

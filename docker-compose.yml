@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: newsletter
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres:password@postgres:5432/newsletter
+    entrypoint: >
+      bash -c "
+        sqlx database create &&
+        sqlx migrate run
+      "
+    volumes:
+      - ./migrations:/migrations:ro
+    working_dir: /
+
+  hyperdx:
+    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
+    ports:
+      - "8080:8080"
+      - "4317:4317"
+      - "4318:4318"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - ./.volumes/db:/data/db
+      - ./.volumes/ch_data:/var/lib/clickhouse
+      - ./.volumes/ch_logs:/var/log/clickhouse-server
+
+  newsletter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      hyperdx:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      APP_OTEL__ENDPOINT: grpc://host.docker.internal:4317
+      # http://localhost:8080 -> create user not already -> click on username -> Team Settings -> API Keys ->
+      # Ingestion API Key
+      APP_OTEL__API_KEY: "<put your key here>"
+      APP_DATABASE__DATABASE_NAME: newsletter
+      APP_DATABASE__HOST: postgres
+      APP_DATABASE__PASSWORD: password
+      APP_DATABASE__USERNAME: postgres
+      APP_DATABASE__REQUIRE_SSL: "false"

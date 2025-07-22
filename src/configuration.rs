@@ -9,7 +9,7 @@ pub struct Settings {
     pub database: DatabaseSettings,
     pub application: ApplicationSettings,
     #[serde(default)]
-    pub otel_endpoint: Option<String>,
+    pub otel: Option<OtelSettings>,
 }
 #[derive(serde::Deserialize)]
 pub struct DatabaseSettings {
@@ -20,6 +20,13 @@ pub struct DatabaseSettings {
     pub database_name: String,
     #[serde(default)]
     pub require_ssl: bool,
+}
+
+#[derive(serde::Deserialize)]
+pub struct OtelSettings {
+    #[serde(default)]
+    pub endpoint: String,
+    pub api_key: SecretString,
 }
 
 impl DatabaseSettings {

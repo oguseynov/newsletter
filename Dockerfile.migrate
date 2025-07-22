@@ -1,0 +1,7 @@
+ARG RUST_VERSION=1.88.0
+
+FROM rust:${RUST_VERSION}-slim-bookworm
+
+RUN apt-get update \
+    && apt-get install -y postgresql-client \
+    && cargo install --version=0.8.6 sqlx-cli --no-default-features --features postgres

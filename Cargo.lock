@@ -1694,6 +1694,7 @@ dependencies = [
  "serde",
  "sqlx",
  "tokio",
+ "tonic",
  "tracing",
  "tracing-actix-web",
  "tracing-bunyan-formatter",

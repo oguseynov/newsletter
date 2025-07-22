@@ -2,6 +2,7 @@
 # secrets for you convinience:
 # APP_DATABASE__DATABASE_NAME, APP_DATABASE__HOST, APP_DATABASE__PASSWORD, APP_DATABASE__USERNAME.
 # For details on what you can set in this file please see https://fly.io/docs/reference/configuration/
+# Install flyctl, please see https://fly.io/docs/flyctl/install/
 # Run `fly lanch` to have it deployed, app value will change to something like `app = 'newsletter-crimson-haze-3386'`
 
 app = 'newsletter'
