@@ -5,7 +5,7 @@ book that builds newsletter app, with my certain additions to the code of it lik
 2) doing certain things differently.
 
 ## Why
-1. Showcasing my ways working with code and infra, and leaving place for questions like 'Why can be improved here?'
+1. Showcasing my ways working with code and infra, and leaving place for questions like 'What can be improved here?'
 2. Place for me to explore new technologies, for example Rust or [Fly](https://fly.io)
 
 ## Already added
