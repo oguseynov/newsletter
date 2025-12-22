@@ -5,14 +5,14 @@ book that builds newsletter app, with my certain additions to the code of it lik
 2) doing certain things differently.
 
 ## Why
-1. Showcasing my ways working with code and infra, and leaving place for questions like 'What can be improved here?'
+1. Showcasing my ways working with code, building backends and infra for them, and leaving place for questions like
+'What can be improved here?'
 2. Place for me to explore new technologies, for example Rust or [Fly](https://fly.io)
 
-## Already added
+## Already there, added by me:
 1. [Otel layer](src/telemetry.rs) for sending traces to [ClickStack](https://clickhouse.com/use-cases/observability).
 2. Deploy to [Fly](https://fly.io), please [fly.toml](fly.toml) file.
-3. Sending traces to [ClickStack](https://clickhouse.com/use-cases/observability) and [docker-compose](docker-compose.yml) 
-file to see it all work together.
+3. Sending traces to [ClickStack](https://clickhouse.com/use-cases/observability) and [docker-compose](docker-compose.yml) file to see it all work together.
 
 ## How to explore
 
