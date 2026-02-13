@@ -16,11 +16,14 @@ use tracing_subscriber::{EnvFilter, Registry, layer::SubscriberExt};
 /// Sets up a new OpenTelemetry pipeline for exporting traces.
 /// This pipeline sends traces to an OTLP-compatible endpoint.
 fn init_trace_pipeline(settings: &OtelSettings) -> Tracer {
+    let api_key = settings
+        .api_key
+        .as_ref()
+        .expect("Otel API key must be set when initializing trace pipeline.");
     let mut metadata = tonic::metadata::MetadataMap::new();
     metadata.insert(
         "authorization",
-        settings
-            .api_key
+        api_key
             .expose_secret()
             .parse()
             .expect("Failed to parse Otel API key."),
@@ -66,6 +69,12 @@ pub fn get_subscriber(
     // It's only added if `OtelSettings` are provided and an endpoint is configured.
     let otel_layer = otel_settings
         .filter(|settings| !settings.endpoint.is_empty())
+        .filter(|settings| {
+            settings
+                .api_key
+                .as_ref()
+                .is_some_and(|api_key| !api_key.expose_secret().is_empty())
+        })
         .map(|settings| OpenTelemetryLayer::new(init_trace_pipeline(&settings)));
 
     // The `Registry` is the foundation of the subscriber.

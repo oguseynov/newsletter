@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: newsletter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hyperdx
+  namespace: newsletter
+spec:
+  selector:
+    app: hyperdx
+  ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hyperdx
+  namespace: newsletter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hyperdx
+  template:
+    metadata:
+      labels:
+        app: hyperdx
+    spec:
+      containers:
+        - name: hyperdx
+          image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one@sha256:52060827fc3320f6f11a93d05ff2f1b79f523fc35ab2e4f63fe8fa748b6b3b56
+          ports:
+            - containerPort: 8080
+            - containerPort: 4317
+            - containerPort: 4318
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          volumeMounts:
+            - name: db
+              mountPath: /data/db
+            - name: ch-data
+              mountPath: /var/lib/clickhouse
+            - name: ch-logs
+              mountPath: /var/log/clickhouse-server
+      volumes:
+        - name: db
+          emptyDir: {}
+        - name: ch-data
+          emptyDir: {}
+        - name: ch-logs
+          emptyDir: {}

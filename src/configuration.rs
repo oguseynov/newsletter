@@ -26,7 +26,8 @@ pub struct DatabaseSettings {
 pub struct OtelSettings {
     #[serde(default)]
     pub endpoint: String,
-    pub api_key: SecretString,
+    #[serde(default)]
+    pub api_key: Option<SecretString>,
 }
 
 impl DatabaseSettings {

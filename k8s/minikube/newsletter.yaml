@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: newsletter
+  namespace: newsletter
+spec:
+  type: ClusterIP
+  selector:
+    app: newsletter
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newsletter
+  namespace: newsletter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newsletter
+  template:
+    metadata:
+      labels:
+        app: newsletter
+    spec:
+      containers:
+        - name: newsletter
+          image: newsletter:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_OTEL__ENDPOINT
+              value: http://hyperdx:4317
+            - name: APP_OTEL__API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: newsletter-secrets
+                  key: otel-api-key
+                  optional: true
+            - name: APP_DATABASE__DATABASE_NAME
+              value: newsletter
+            - name: APP_DATABASE__HOST
+              value: postgres
+            - name: APP_DATABASE__PASSWORD
+              value: password
+            - name: APP_DATABASE__USERNAME
+              value: postgres
+            - name: APP_DATABASE__REQUIRE_SSL
+              value: "false"
+          readinessProbe:
+            httpGet:
+              path: /health_check
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health_check
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
