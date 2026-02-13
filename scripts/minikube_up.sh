@@ -23,8 +23,7 @@ fi
 minikube image build -t newsletter:local -f Dockerfile .
 minikube image build -t newsletter-migrate:local -f Dockerfile.migrate .
 
-kubectl apply -f k8s/minikube/clickstack.yaml
-kubectl apply -f k8s/minikube/postgres.yaml
+kubectl apply -k k8s/minikube
 kubectl -n "$NAMESPACE" rollout status statefulset/postgres --timeout=300s
 kubectl -n "$NAMESPACE" wait --for=condition=ready pod -l app=postgres --timeout=180s
 
@@ -41,7 +40,6 @@ if [[ -n "${HYPERDX_INGESTION_KEY:-}" ]]; then
   ./scripts/set_hyperdx_key.sh --no-restart
 fi
 
-kubectl apply -f k8s/minikube/newsletter.yaml
 kubectl -n "$NAMESPACE" rollout status deployment/newsletter --timeout=300s
 
 cat <<MSG

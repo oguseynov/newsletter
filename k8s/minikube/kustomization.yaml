@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: newsletter
+resources:
+  - clickstack.yaml
+  - postgres.yaml
+  - migrate-job.yaml
+  - newsletter.yaml

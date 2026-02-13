@@ -1,0 +1,20 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: newsletter-db
+  namespace: newsletter
+spec:
+  instances: 3
+
+  storage:
+    size: 10Gi
+
+  bootstrap:
+    initdb:
+      database: newsletter
+      owner: app
+      secret:
+        name: db-app
+
+  monitoring:
+    enablePodMonitor: false

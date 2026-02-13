@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+  namespace: newsletter
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      labels:
+        app: migrate
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: newsletter-migrate:latest
+          env:
+            - name: DB_HOST
+              value: newsletter-db-rw
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: newsletter
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-app
+                  key: password
+          command:
+            - sh
+            - -c
+            - |
+              export DATABASE_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require"
+              sqlx migrate run --source /app/migrations

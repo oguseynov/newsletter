@@ -15,6 +15,9 @@ book that builds newsletter app, with my certain additions to the code of it lik
 3. Sending traces to [ClickStack](https://clickhouse.com/use-cases/observability) and [docker-compose](docker-compose.yml) file to see it all work together.
 4. Kubernetes resources[k8s/minikube](k8s/minikube/) and scripts for [minikube up](scripts/minikube_up.sh) and 
 [down](scripts/minikube_down.sh).
+5. Kustomize setup for:
+   - minikube (`StatefulSet` Postgres): [k8s/minikube](k8s/minikube/)
+   - production (`CloudNativePG`): [k8s/production](k8s/production/)
 
 ## How to explore
 
@@ -30,10 +33,15 @@ This project now has Kubernetes manifests that mirror the current local setup:
 - migrate job
 - hyperdx (ClickStack all-in-one)
 - newsletter service
+- kustomize entrypoint: `k8s/minikube/kustomization.yaml`
 
 Bring everything up with:
 ```shell
 ./scripts/minikube_up.sh
+```
+or directly:
+```shell
+kubectl apply -k k8s/minikube
 ```
 
 By default, the script starts Minikube with `5 CPU` and `10240MB` memory.
@@ -84,6 +92,36 @@ Tear down Minikube resources:
 Optional cleanup flags:
 ```shell
 ./scripts/minikube_down.sh --remove-images --stop-cluster
+```
+
+## Production k8s (WIP)
+### Production Postgres  with CloudNativePG minimal
+Install CloudNativePG operator first (pinned version via Kustomize):
+```shell
+kubectl apply -k k8s/operators/cloudnative-pg
+kubectl rollout status deployment/cnpg-controller-manager -n cnpg-system
+```
+
+Then apply app + database resources:
+```shell
+kubectl apply -k k8s/production
+```
+
+This creates:
+- namespace `newsletter`
+- app credentials secret `db-app` (change default password before applying)
+- CloudNativePG cluster `newsletter-db` (3 instances)
+- migration job `migrate` (`newsletter-migrate:latest`)
+- newsletter app `Service` + `Deployment` (update image `newsletter:latest` to your registry tag)
+
+Connection endpoint for app workloads in the same namespace:
+- read/write service: `newsletter-db-rw:5432`
+
+To rerun migrations on a later rollout:
+```shell
+kubectl -n newsletter delete job migrate --ignore-not-found=true
+kubectl apply -k k8s/production
+kubectl -n newsletter wait --for=condition=complete job/migrate --timeout=300s
 ```
 
 ### Run with docker-compose (with ClickStack accepting traces)
