@@ -13,6 +13,8 @@ book that builds newsletter app, with my certain additions to the code of it lik
 1. [Otel layer](src/telemetry.rs) for sending traces to [ClickStack](https://clickhouse.com/use-cases/observability).
 2. Deploy to [Fly](https://fly.io), please [fly.toml](fly.toml) file.
 3. Sending traces to [ClickStack](https://clickhouse.com/use-cases/observability) and [docker-compose](docker-compose.yml) file to see it all work together.
+4. Kubernetes resources[k8s/minikube](k8s/minikube/) and scripts for [minikube up](scripts/minikube_up.sh) and 
+[down](scripts/minikube_down.sh).
 
 ## How to explore
 
