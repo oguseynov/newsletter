@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres
+    image: postgres:17
     ports:
       - "5432:5432"
     environment:
@@ -32,7 +32,7 @@ services:
     working_dir: /
 
   hyperdx:
-    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
+    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one@sha256:52060827fc3320f6f11a93d05ff2f1b79f523fc35ab2e4f63fe8fa748b6b3b56
     ports:
       - "8080:8080"
       - "4317:4317"

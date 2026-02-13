@@ -1,6 +1,6 @@
 ARG RUST_VERSION=1.88.0
 
-FROM lukemathwalker/cargo-chef:latest-rust-${RUST_VERSION} AS chef
+FROM lukemathwalker/cargo-chef:0.1.72-rust-1.88.0-slim-bookworm AS chef
 WORKDIR /app
 RUN apt update && apt install lld clang -y
 
