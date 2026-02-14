@@ -7,6 +7,6 @@ resources:
   - clickstack-otel-secret.yaml
   - networkpolicy.yaml
   - postgres-cluster.yaml
-  - logs-collector.yaml
+  - otel-collectors.yaml
   - migrate-job.yaml
   - newsletter.yaml

@@ -149,7 +149,10 @@ spec:
               app: newsletter
         - podSelector:
             matchLabels:
-              app: otel-logs-collector
+              app: otel-node-collector
+        - podSelector:
+            matchLabels:
+              app: otel-cluster-collector
       ports:
         - protocol: TCP
           port: 4317
@@ -157,33 +160,27 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-otel-collector-egress-hyperdx
+  name: allow-otel-node-collector-egress
   namespace: newsletter
 spec:
   podSelector:
     matchLabels:
-      app: otel-logs-collector
+      app: otel-node-collector
   policyTypes:
     - Egress
   egress:
-    - to:
-        - podSelector:
-            matchLabels:
-              app: hyperdx
-      ports:
-        - protocol: TCP
-          port: 4317
-    # k8sattributes needs Kubernetes API access.
-    - to:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: kube-system
-          podSelector:
-            matchLabels:
-              component: kube-apiserver
-              tier: control-plane
-      ports:
-        - protocol: TCP
-          port: 443
-        - protocol: TCP
-          port: 8443
+    - {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-otel-cluster-collector-egress
+  namespace: newsletter
+spec:
+  podSelector:
+    matchLabels:
+      app: otel-cluster-collector
+  policyTypes:
+    - Egress
+  egress:
+    - {}

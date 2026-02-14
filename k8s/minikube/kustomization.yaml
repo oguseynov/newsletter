@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: newsletter
 resources:
   - clickstack.yaml
-  - logs-collector.yaml
+  - otel-collectors.yaml
   - networkpolicy.yaml
   - postgres.yaml
   - migrate-job.yaml
