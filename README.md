@@ -19,6 +19,7 @@ book that builds newsletter app, with my certain additions to the code of it lik
    - minikube (`StatefulSet` Postgres): [k8s/minikube](k8s/minikube/)
    - production (`CloudNativePG`): [k8s/production](k8s/production/)
 6. Sending k8s logs to ClickStack via OTLP gRPC using [otel-logs-collector](k8s/minikube/logs-collector.yaml)
+7. Strict network policy: default deny for all traffic, then explicit allow rules for required connections.
 
 ## How to explore
 
@@ -35,6 +36,7 @@ This project now has Kubernetes manifests that mirror the current local setup:
 - hyperdx (ClickStack all-in-one)
 - OpenTelemetry logs collector (`DaemonSet`) shipping Kubernetes container logs to ClickStack
 - newsletter service
+- NetworkPolicies (default deny + explicit allows)
 - kustomize entrypoint: `k8s/minikube/kustomization.yaml`
 
 Bring everything up with:
@@ -56,6 +58,14 @@ Override if needed:
 ```shell
 MINIKUBE_CNI=flannel ./scripts/minikube_up.sh
 ```
+
+NetworkPolicy for minikube is defined in [k8s/minikube/networkpolicy.yaml](k8s/minikube/networkpolicy.yaml):
+- default deny for all pods (`Ingress` + `Egress`)
+- allow DNS egress to `kube-dns`
+- allow `newsletter` ingress on `8000`
+- allow `newsletter` and `migrate` egress to `postgres:5432`
+- allow `postgres` ingress from `newsletter` and `migrate`
+- allow OTLP flow `newsletter`/`otel-logs-collector` -> `hyperdx:4317`
 
 Then port-forward:
 ```shell
@@ -117,6 +127,15 @@ This creates:
 - OpenTelemetry logs collector (`DaemonSet`) shipping Kubernetes container logs to ClickStack
 - migration job `migrate` (`newsletter-migrate:latest`)
 - newsletter app `Service` + `Deployment` (update image `newsletter:latest` to your registry tag)
+- NetworkPolicies (default deny + explicit allows)
+
+NetworkPolicy for production is defined in [k8s/production/networkpolicy.yaml](k8s/production/networkpolicy.yaml):
+- default deny for all pods (`Ingress` + `Egress`)
+- allow DNS egress to `kube-dns`
+- allow `newsletter` ingress on `8000`
+- allow `newsletter` and `migrate` egress to CloudNativePG pods on `5432`
+- allow CloudNativePG pod ingress from `newsletter`, `migrate`, and same-cluster DB pods
+- allow unrestricted egress for `otel-logs-collector` so it can send logs to external ClickStack OTLP endpoint
 
 For local/bootstrap only, set ClickStack endpoint and API key manually:
 ```shell

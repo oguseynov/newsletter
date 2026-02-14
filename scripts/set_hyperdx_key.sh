@@ -5,6 +5,7 @@ NAMESPACE="${NAMESPACE:-newsletter}"
 SECRET_NAME="newsletter-secrets"
 SECRET_KEY="otel-api-key"
 DEPLOYMENT_NAME="newsletter"
+COLLECTOR_DAEMONSET_NAME="otel-logs-collector"
 RESTART_DEPLOYMENT=true
 
 if [[ "${1:-}" == "--no-restart" ]]; then
@@ -32,6 +33,8 @@ kubectl -n "$NAMESPACE" create secret generic "$SECRET_NAME" \
 if [[ "$RESTART_DEPLOYMENT" == "true" ]]; then
   kubectl -n "$NAMESPACE" rollout restart deployment/"$DEPLOYMENT_NAME"
   kubectl -n "$NAMESPACE" rollout status deployment/"$DEPLOYMENT_NAME" --timeout=180s
+  kubectl -n "$NAMESPACE" rollout restart daemonset/"$COLLECTOR_DAEMONSET_NAME"
+  kubectl -n "$NAMESPACE" rollout status daemonset/"$COLLECTOR_DAEMONSET_NAME" --timeout=180s
 fi
 
 echo "Secret '$SECRET_NAME' updated in namespace '$NAMESPACE'."

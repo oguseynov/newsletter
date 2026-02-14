@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - db-app-secret.yaml
   - clickstack-otel-secret.yaml
+  - networkpolicy.yaml
   - postgres-cluster.yaml
   - logs-collector.yaml
   - migrate-job.yaml
