@@ -25,6 +25,7 @@ minikube image build -t newsletter-migrate:local -f Dockerfile.migrate .
 
 kubectl apply -k k8s/minikube
 kubectl -n "$NAMESPACE" rollout status statefulset/postgres --timeout=300s
+kubectl -n "$NAMESPACE" rollout status daemonset/otel-logs-collector --timeout=300s
 kubectl -n "$NAMESPACE" wait --for=condition=ready pod -l app=postgres --timeout=180s
 
 kubectl -n "$NAMESPACE" delete job migrate --ignore-not-found=true

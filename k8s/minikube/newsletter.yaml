@@ -35,7 +35,7 @@ spec:
             - containerPort: 8000
           env:
             - name: APP_OTEL__ENDPOINT
-              value: http://hyperdx:4317
+              value: grpc://hyperdx:4317
             - name: APP_OTEL__API_KEY
               valueFrom:
                 secretKeyRef:

@@ -32,6 +32,7 @@ This project now has Kubernetes manifests that mirror the current local setup:
 - postgres
 - migrate job
 - hyperdx (ClickStack all-in-one)
+- OpenTelemetry logs collector (`DaemonSet`) shipping Kubernetes container logs to ClickStack
 - newsletter service
 - kustomize entrypoint: `k8s/minikube/kustomization.yaml`
 
@@ -110,9 +111,20 @@ kubectl apply -k k8s/production
 This creates:
 - namespace `newsletter`
 - app credentials secret `db-app` (change default password before applying)
+- ClickStack logs credentials secret `clickstack-otel` (placeholder values in Git; Vault/External Secrets integration is planned later)
 - CloudNativePG cluster `newsletter-db` (3 instances)
+- OpenTelemetry logs collector (`DaemonSet`) shipping Kubernetes container logs to ClickStack
 - migration job `migrate` (`newsletter-migrate:latest`)
 - newsletter app `Service` + `Deployment` (update image `newsletter:latest` to your registry tag)
+
+For local/bootstrap only, set ClickStack endpoint and API key manually:
+```shell
+kubectl -n newsletter create secret generic clickstack-otel \
+  --from-literal=endpoint=ingest.<your-clickstack-domain>:4317 \
+  --from-literal=api-key=<your-clickstack-ingestion-api-key> \
+  --dry-run=client -o yaml | kubectl apply -f -
+```
+Secret-manager backed sourcing for `clickstack-otel` will be implemented later (e.g., HashiCorp Vault via External Secrets Operator).
 
 Connection endpoint for app workloads in the same namespace:
 - read/write service: `newsletter-db-rw:5432`
