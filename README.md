@@ -18,6 +18,7 @@ book that builds newsletter app, with my certain additions to the code of it lik
 5. Kustomize setup for:
    - minikube (`StatefulSet` Postgres): [k8s/minikube](k8s/minikube/)
    - production (`CloudNativePG`): [k8s/production](k8s/production/)
+6. Sending k8s logs to ClickStack via OTLP gRPC using [otel-logs-collector](k8s/minikube/logs-collector.yaml)
 
 ## How to explore
 
